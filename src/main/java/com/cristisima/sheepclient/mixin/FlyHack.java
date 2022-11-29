@@ -58,7 +58,7 @@ public class FlyHack {
 
         newY-=bypasDiff;
 
-
+        SheepClient.LOGGER.info("AntiAntiFly with "+client.player.getPos());
         PlayerMoveC2SPacket packet=new PlayerMoveC2SPacket.PositionAndOnGround(
                 client.player.getPos().getX(),
                 newY,
@@ -103,6 +103,7 @@ public class FlyHack {
                 client.player.getVelocity().getZ()
         );
 
+        SheepClient.LOGGER.info("no Fall with "+client.player.getPos());
         PlayerMoveC2SPacket packet=new PlayerMoveC2SPacket.PositionAndOnGround(
                 client.player.getPos().getX(),
                 newY,

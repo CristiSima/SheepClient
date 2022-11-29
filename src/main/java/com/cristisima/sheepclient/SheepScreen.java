@@ -22,7 +22,8 @@ public class SheepScreen extends Screen {
     public static String NO_FALL_BASE="No Fall Dmg: ";
     public static String NO_POSITION_PACKET_BASE="No Position packet: ";
     public static String INITIAL_Y_OFFSET_BASE="Initial Y Offset: ";
-    public static String INJECT_Y_VELOCITY="Inject Y Velocity";
+    public static String ALLOW_DEMO_BASE="Demo?: ";
+    public static String ALLOW_CREATIVE_BASE="Creative?: ";
 
     int injectedYVelocityVal=0;
 
@@ -138,10 +139,14 @@ public class SheepScreen extends Screen {
 
         i++;
 
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i), this.height / 6 - 12 + 24 * (i >> 1), 150, 20,
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i), this.height / 6 - 12 + 24 * (i >> 1), 120, 20,
                 Text.literal(OnOffName(NO_POSITION_PACKET_BASE, Variables.noPositionPacket)), (button) -> {
             Variables.noPositionPacket=!Variables.noPositionPacket;
             button.setMessage(Text.literal(OnOffName(NO_POSITION_PACKET_BASE, Variables.noPositionPacket)));
+        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+125, this.height / 6 - 12 + 24 * (i >> 1), 40, 20,
+                Text.literal("Fix Pos"), (button) -> {
+            Variables.fixPositionActive=true;
         }));
 
 
@@ -182,9 +187,15 @@ public class SheepScreen extends Screen {
 //            injectedYVelocity.setMessage(Text.literal(""+injectedYVelocityVal));
 //        }));
         i++;
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i), this.height / 6 - 12 + 24 * (i >> 1), 150, 20,
-                Text.literal("Fix Pos"), (button) -> {
-            Variables.fixPositionActive=true;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i), this.height / 6 - 12 + 24 * (i >> 1), 60, 20,
+                Text.literal(OnOffName(ALLOW_DEMO_BASE, !Variables.noDemo)), (button) -> {
+            Variables.noDemo=!Variables.noDemo;
+            button.setMessage(Text.literal(OnOffName(ALLOW_DEMO_BASE, !Variables.noDemo)));
+        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+65, this.height / 6 - 12 + 24 * (i >> 1), 80, 20,
+                Text.literal(OnOffName(ALLOW_CREATIVE_BASE, !Variables.noCreative)), (button) -> {
+            Variables.noCreative=!Variables.noCreative;
+            button.setMessage(Text.literal(OnOffName(ALLOW_CREATIVE_BASE, !Variables.noCreative)));
         }));
     }
 

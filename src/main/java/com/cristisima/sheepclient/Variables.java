@@ -7,14 +7,14 @@ import java.util.Set;
 
 public class Variables {
     public  static class PositionPrecision {
-        public static int DEFAULT = 2;
+        public static int DEFAULT = 1;
         public static int PRECISION = DEFAULT;
         public static boolean active = true;
     }
     public static class InitialHeightOffset
     {
-        public static boolean active=true;
-        public static int DEFAULT = 1;
+        public static boolean active=false;
+        public static int DEFAULT = 0;
         public static int offset=DEFAULT;
         public static boolean initialized=false;
         public static int DefaultInitializedCount =2;
@@ -32,6 +32,8 @@ public class Variables {
 
     public static int injectedYVelocity=0;
     public static boolean noPositionPacket=false;
+    public static boolean noDemo=true;
+    public static boolean noCreative=false;
     public static boolean fixPositionActive=false;
     public static boolean FlyActive=true;
     public static boolean NoFall=true;

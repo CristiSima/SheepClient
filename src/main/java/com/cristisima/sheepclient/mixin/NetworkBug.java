@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.network.packet.c2s.play.AdvancementTabC2SPacket;
+import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
 
 import java.util.Map;
 //import net.minecraft.network.listener.
@@ -85,7 +85,7 @@ public abstract class NetworkBug implements IMixinClientConn {
 
 
         String packet_name=packet.getClass().getSimpleName();
-        SheepClient.LOGGER.info("Network Bug found(SEND): "+packet_name);
+//        SheepClient.LOGGER.info("Network Bug found(SEND): "+packet_name);
     }
 
     @Inject(at=@At("HEAD"), method = "handlePacket")
@@ -98,6 +98,33 @@ public abstract class NetworkBug implements IMixinClientConn {
         }
     }
 
+    @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
+    private static <T extends PacketListener> void handleDemo(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+        if(!Variables.noDemo)
+            return;
+
+        if(!packet.getClass().equals(GameStateChangeS2CPacket.class))
+            return;
+
+        GameStateChangeS2CPacket eventPacket= (GameStateChangeS2CPacket) packet;
+
+        if(eventPacket.getReason()==GameStateChangeS2CPacket.DEMO_MESSAGE_SHOWN)
+            ci.cancel();
+    }
+    @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
+    private static <T extends PacketListener> void handleChangeGamemode(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+        if(!packet.getClass().equals(GameStateChangeS2CPacket.class))
+            return;
+
+        GameStateChangeS2CPacket eventPacket= (GameStateChangeS2CPacket) packet;
+
+        if(eventPacket.getReason()!=GameStateChangeS2CPacket.GAME_MODE_CHANGED)
+            return;
+        if(Variables.noCreative &&
+            eventPacket.getValue()==1)
+            ci.cancel();
+//        eventPacket.
+    }
 
     @Inject(at=@At("HEAD"), method = "handlePacket")
     private static <T extends PacketListener> void handleAdvancementUpdateS2CPacket(Packet<T> orgPacket, PacketListener listener, CallbackInfo ci) {
