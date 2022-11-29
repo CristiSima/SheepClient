@@ -22,6 +22,8 @@ public class SheepScreen extends Screen {
     public static String NO_FALL_BASE="No Fall Dmg: ";
     public static String NO_POSITION_PACKET_BASE="No Position packet: ";
     public static String INITIAL_Y_OFFSET_BASE="Initial Y Offset: ";
+    public static String CAT_EYES_BASE="Cat Eyes: ";
+    public static String XRAY_BASE="xRay: ";
     public static String ALLOW_DEMO_BASE="Demo?: ";
     public static String ALLOW_CREATIVE_BASE="Creative?: ";
 
@@ -46,6 +48,8 @@ public class SheepScreen extends Screen {
     @Override
     protected void init() {
         int i=-1;
+        int x_base=0;
+        int width;
 
         i++;
         this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)-50, this.height / 6 - 12 + 24 * (i >> 1), 150*3/4, 20,
@@ -85,18 +89,23 @@ public class SheepScreen extends Screen {
         }));
 
         i++;
+        x_base=-20;
 
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i), this.height / 6 - 12 + 24 * (i >> 1), 50, 20,
+        width=50;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
                 Text.literal(OnOffName(FLY_BASE, Variables.FlyActive)), (button) -> {
             Variables.FlyActive=!Variables.FlyActive;
             button.setMessage(Text.literal(OnOffName(FLY_BASE, Variables.FlyActive)));
         }));
+        x_base+=width+5;
 
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+55, this.height / 6 - 12 + 24 * (i >> 1), 95, 20,
+        width=95;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
                 Text.literal(OnOffName(NO_FALL_BASE, Variables.NoFall)), (button) -> {
             Variables.NoFall=!Variables.NoFall;
             button.setMessage(Text.literal(OnOffName(NO_FALL_BASE, Variables.NoFall)));
         }));
+        x_base+=width+5;
 
 
         i++;
@@ -138,66 +147,94 @@ public class SheepScreen extends Screen {
 
 
         i++;
+        x_base=-20;
 
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i), this.height / 6 - 12 + 24 * (i >> 1), 120, 20,
+        width=120;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
                 Text.literal(OnOffName(NO_POSITION_PACKET_BASE, Variables.noPositionPacket)), (button) -> {
             Variables.noPositionPacket=!Variables.noPositionPacket;
             button.setMessage(Text.literal(OnOffName(NO_POSITION_PACKET_BASE, Variables.noPositionPacket)));
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+125, this.height / 6 - 12 + 24 * (i >> 1), 40, 20,
+        x_base+=width+5;
+
+        width=40;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
                 Text.literal("Fix Pos"), (button) -> {
             Variables.fixPositionActive=true;
         }));
+        x_base+=width+5;
 
 
         i++;
 
-//        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)-50, this.height / 6 - 12 + 24 * (i >> 1), 150*3/4, 20,
-//                Text.literal(INJECT_Y_VELOCITY), (button) -> {
-//            Variables.injectedYVelocity=injectedYVelocityVal;
-//        }));
-//
-//        ButtonWidget injectedYVelocity=new ButtonWidget(this.width / 2 + calcXOffset(i)+150*3/4-50+25+5, this.height / 6 - 12 + 24 * (i >> 1), 20, 20,
-//                Text.literal(""+injectedYVelocityVal), (button) -> {
-//
-//            SheepClient.LOGGER.info("precision reset");
-//            injectedYVelocityVal = 0;
-//
-//            button.setMessage(Text.literal(""+injectedYVelocityVal));
-//        });
-//        this.addDrawableChild(injectedYVelocity);
-//
-//        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+150*3/4-50+5, this.height / 6 - 12 + 24 * (i >> 1), 20, 20,
-//                Text.literal("-"), (button) -> {
-//            injectedYVelocityVal =Math.max(
-//                    0,
-//                    injectedYVelocityVal-1
-//            );
-//
-//            injectedYVelocity.setMessage(Text.literal(""+injectedYVelocityVal));
-//
-//        }));
-//        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+150*3/4-50+50+5, this.height / 6 - 12 + 24 * (i >> 1), 20, 20,
-//                Text.literal("+"), (button) -> {
-//            injectedYVelocityVal =Math.min(
-//                    10,
-//                    injectedYVelocityVal+1
-//            );
-//
-//            injectedYVelocity.setMessage(Text.literal(""+injectedYVelocityVal));
-//        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)-50, this.height / 6 - 12 + 24 * (i >> 1), 150*3/4, 20,
+                Text.literal(OnOffName(CAT_EYES_BASE, Variables.CatEyes.active)), (button) -> {
+            Variables.CatEyes.active=!Variables.CatEyes.active;
+
+            button.setMessage(Text.literal(OnOffName(CAT_EYES_BASE, Variables.CatEyes.active)));
+        }));
+
+        ButtonWidget CatEyesWidget=new ButtonWidget(this.width / 2 + calcXOffset(i)+150*3/4-50+25+5, this.height / 6 - 12 + 24 * (i >> 1), 20, 20,
+                Text.literal(String.valueOf(Variables.CatEyes.forced_min)), (button) -> {
+            Variables.CatEyes.forced_min=10;
+        });
+        this.addDrawableChild(CatEyesWidget);
+
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+150*3/4-50+5, this.height / 6 - 12 + 24 * (i >> 1), 20, 20,
+                Text.literal("-"), (button) -> {
+            Variables.CatEyes.forced_min =Math.max(
+                    0,
+                    Variables.CatEyes.forced_min-1
+            );
+
+            CatEyesWidget.setMessage(Text.literal(String.valueOf(Variables.CatEyes.forced_min)));
+
+        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+150*3/4-50+50+5, this.height / 6 - 12 + 24 * (i >> 1), 20, 20,
+                Text.literal("+"), (button) -> {
+            Variables.CatEyes.forced_min =Math.min(
+                    Variables.CatEyes.MAX,
+                    Variables.CatEyes.forced_min+1
+            );
+
+            CatEyesWidget.setMessage(Text.literal(String.valueOf(Variables.CatEyes.forced_min)));
+        }));
+
         i++;
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i), this.height / 6 - 12 + 24 * (i >> 1), 60, 20,
+        x_base=-20;
+
+        width=60;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
                 Text.literal(OnOffName(ALLOW_DEMO_BASE, !Variables.noDemo)), (button) -> {
             Variables.noDemo=!Variables.noDemo;
             button.setMessage(Text.literal(OnOffName(ALLOW_DEMO_BASE, !Variables.noDemo)));
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+65, this.height / 6 - 12 + 24 * (i >> 1), 80, 20,
+        x_base+=width+5;
+
+        width=80;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
                 Text.literal(OnOffName(ALLOW_CREATIVE_BASE, !Variables.noCreative)), (button) -> {
             Variables.noCreative=!Variables.noCreative;
             button.setMessage(Text.literal(OnOffName(ALLOW_CREATIVE_BASE, !Variables.noCreative)));
         }));
+        x_base+=width+5;
+
+
+        i++;
+
+        i++;
+        x_base=-20;
+
+        width=60;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
+                Text.literal(OnOffName(XRAY_BASE, Variables.xRay.active)), (button) -> {
+            Variables.xRay.active=!Variables.xRay.active;
+            button.setMessage(Text.literal(OnOffName(XRAY_BASE, Variables.xRay.active)));
+        }));
+        x_base+=width+5;
+
     }
+
 
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);

@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Variables {
     public  static class PositionPrecision {
-        public static int DEFAULT = 1;
+        public static int DEFAULT = 2;
         public static int PRECISION = DEFAULT;
         public static boolean active = true;
     }
@@ -28,6 +28,18 @@ public class Variables {
 
         public static boolean reconnectOnMultiplayerMenu=false;
 //        public static
+    }
+
+    public static class xRay
+    {
+        public static boolean active=false;
+    }
+
+    public static class CatEyes
+    {
+        public static boolean active=true;
+        public static final int MAX=15;
+        public static int forced_min=10;
     }
 
     public static int injectedYVelocity=0;

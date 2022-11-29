@@ -15,7 +15,9 @@
     "AutoReconnect.ExtractConnection",
     "AutoReconnect.MenuOnDisconnect",
     "AutoReconnect.ReconnectOnMenu",
-    "MixinClientPlayerEntity"
+    "MixinClientPlayerEntity",
+    "XRay",
+    "CatEyes"
   ],
   "injectors": {
     "defaultRequire": 1
