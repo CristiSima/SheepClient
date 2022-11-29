@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.cristisima.sheepclient.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "PositionPrecision",
+    "SheepClientMenu_Setings",
+    "NoBorder",
+    "NetworkBug",
+    "Exposers.MixinAdvancement_Builder",
+    "FlyHack",
+    "AutoReconnect.ExtractConnection",
+    "AutoReconnect.MenuOnDisconnect",
+    "AutoReconnect.ReconnectOnMenu",
+    "MixinClientPlayerEntity"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
