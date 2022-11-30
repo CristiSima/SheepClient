@@ -17,7 +17,8 @@
     "AutoReconnect.ReconnectOnMenu",
     "MixinClientPlayerEntity",
     "XRay",
-    "CatEyes"
+    "CatEyes",
+    "XRayFix"
   ],
   "injectors": {
     "defaultRequire": 1

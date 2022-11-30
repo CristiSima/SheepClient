@@ -19,6 +19,7 @@ import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.launch.platform.container.IContainerHandle;
@@ -121,8 +122,20 @@ public abstract class NetworkBug implements IMixinClientConn {
         if(eventPacket.getReason()!=GameStateChangeS2CPacket.GAME_MODE_CHANGED)
             return;
         if(Variables.noCreative &&
-            eventPacket.getValue()==1)
+                eventPacket.getValue()==1)
             ci.cancel();
+//        eventPacket.
+    }
+    @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
+    private static <T extends PacketListener> void handleWorldBorder(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+        if(!packet.getClass().equals(WorldBorderInitializeS2CPacket.class))
+            return;
+
+//        WorldBorderInitializeS2CPacket borderPacket= (WorldBorderInitializeS2CPacket) packet;
+//
+//        if(eventPacket.getReason()!=GameStateChangeS2CPacket.GAME_MODE_CHANGED)
+//            return;
+        ci.cancel();
 //        eventPacket.
     }
 

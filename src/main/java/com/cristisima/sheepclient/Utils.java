@@ -16,7 +16,7 @@ public class Utils {
                 blockKey.equals("block.minecraft.soulsoil") ||
                 blockKey.equals("block.minecraft.netherrack") ||
                 blockKey.equals("block.minecraft.basalt") ||
-                blockKey.equals("block.minecraft.blackrock") ||
+                blockKey.equals("block.minecraft.blackstone") ||
                 blockKey.equals("block.minecraft.dirt");
     }
 }
