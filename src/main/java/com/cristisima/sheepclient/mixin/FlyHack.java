@@ -1,14 +1,11 @@
 package com.cristisima.sheepclient.mixin;
-import com.cristisima.sheepclient.SheepClient;
 import com.cristisima.sheepclient.Variables;
 import com.cristisima.sheepclient.access.IMixinClientConn;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +20,7 @@ public class FlyHack {
     @Shadow @Final protected MinecraftClient client;
 
     @Shadow @Final public ClientPlayNetworkHandler networkHandler;
-    double bypasDiff=0.1;
+    double bypassDiff =0.1;
 
     double prevY;
     int flyCount=0;
@@ -56,7 +53,7 @@ public class FlyHack {
         if(client.player.getVelocity().getY()<-0.1)
             return;
 
-        newY-=bypasDiff;
+        newY-= bypassDiff;
 
 //        SheepClient.LOGGER.info("AntiAntiFly with "+client.player.getPos());
         PlayerMoveC2SPacket packet=new PlayerMoveC2SPacket.PositionAndOnGround(
@@ -95,7 +92,7 @@ public class FlyHack {
         if((fallCount++)%10!=0)
             return;
 
-        newY+=bypasDiff;
+        newY+= bypassDiff;
 
         client.player.setVelocity(
                 client.player.getVelocity().getX(),

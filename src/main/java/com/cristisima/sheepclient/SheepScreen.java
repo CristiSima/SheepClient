@@ -26,6 +26,7 @@ public class SheepScreen extends Screen {
     public static String XRAY_BASE="xRay: ";
     public static String ALLOW_DEMO_BASE="Demo?: ";
     public static String ALLOW_CREATIVE_BASE="Creative?: ";
+    public static String UNEVENTFUL_MOVE_BASE="Uneventful Move: ";
 
     int injectedYVelocityVal=0;
 
@@ -230,6 +231,19 @@ public class SheepScreen extends Screen {
                 Text.literal(OnOffName(XRAY_BASE, Variables.xRay.active)), (button) -> {
             Variables.xRay.active=!Variables.xRay.active;
             button.setMessage(Text.literal(OnOffName(XRAY_BASE, Variables.xRay.active)));
+        }));
+        x_base+=width+5;
+
+        i++;
+
+        i++;
+        x_base=-20;
+
+        width=120;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
+                Text.literal(OnOffName(UNEVENTFUL_MOVE_BASE, Variables.uneventfulMove)), (button) -> {
+            Variables.uneventfulMove=!Variables.uneventfulMove;
+            button.setMessage(Text.literal(OnOffName(UNEVENTFUL_MOVE_BASE, Variables.uneventfulMove)));
         }));
         x_base+=width+5;
 

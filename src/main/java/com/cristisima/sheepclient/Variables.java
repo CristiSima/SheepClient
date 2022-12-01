@@ -44,6 +44,7 @@ public class Variables {
 
     public static int injectedYVelocity=0;
     public static boolean noPositionPacket=false;
+    public static boolean uneventfulMove =false;
     public static boolean noDemo=true;
     public static boolean noCreative=false;
     public static boolean fixPositionActive=false;

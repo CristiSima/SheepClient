@@ -18,7 +18,8 @@
     "MixinClientPlayerEntity",
     "XRay",
     "CatEyes",
-    "XRayFix"
+    "XRayFix",
+    "IgnoreForcedRotation"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,5 +1,7 @@
 package com.cristisima.sheepclient.mixin;
 
+import com.cristisima.sheepclient.Flags;
+import com.cristisima.sheepclient.Utils;
 import com.cristisima.sheepclient.Variables;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -12,17 +14,19 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class PositionPrecisionMovePacket {
     @ModifyVariable(method = "<init>", at = @At("HEAD"), ordinal = 0)
     private static double ConstructorX(double x) {
-        if (Variables.PositionPrecision.active) {
-            double scale = Math.pow(10, Variables.PositionPrecision.PRECISION);
-            return Math.round(x * scale) / scale;
+        if (Flags.positionPrecision()) {
+            x= Utils.precisionRound(x,Variables.PositionPrecision.PRECISION);
+//            if(Utils.getDecimal(x,Variables.PositionPrecision.PRECISION+1)!=0)
+//                System.out.println("ConstructorX round err");
         }
         return x;
     }
     @ModifyVariable(method = "<init>", at = @At("HEAD"), ordinal = 2)
     private static double ConstructorZ(double z) {
-        if (Variables.PositionPrecision.active) {
-            double scale = Math.pow(10, Variables.PositionPrecision.PRECISION);
-            return Math.round(z * scale) / scale;
+        if (Flags.positionPrecision()) {
+            z= Utils.precisionRound(z,Variables.PositionPrecision.PRECISION);
+//            if(Utils.getDecimal(z,Variables.PositionPrecision.PRECISION+1)!=0)
+//                System.out.println("ConstructorZ round err");
         }
         return z;
     }

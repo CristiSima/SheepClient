@@ -1,6 +1,8 @@
 package com.cristisima.sheepclient.mixin;
 
+import com.cristisima.sheepclient.Flags;
 import com.cristisima.sheepclient.SheepClient;
+import com.cristisima.sheepclient.Utils;
 import com.cristisima.sheepclient.Variables;
 import com.cristisima.sheepclient.access.IMixinClientConn;
 import net.minecraft.client.MinecraftClient;
@@ -24,18 +26,12 @@ public class MixinClientPlayerEntity {
 
     @Shadow @Final public ClientPlayNetworkHandler networkHandler;
 
+
     @Inject(method = "tick", at = @At("HEAD"))
     void posBefore(CallbackInfo ci)
     {
 //        SheepClient.LOGGER.info("before "+client.player.getPos().toString());
     }
-
-    double precisionRound(double nr)
-    {
-        double scale = Math.pow(10, Variables.PositionPrecision.PRECISION);
-        return Math.round(nr*scale)/scale;
-    }
-
 
     @Inject(method = "tick", at = @At("HEAD"))
     void fixPos(CallbackInfo ci)
@@ -46,9 +42,9 @@ public class MixinClientPlayerEntity {
         double maxDist=0.0035;
 
         Vec3d diff=client.player.getPos().subtract(new Vec3d(
-                precisionRound(client.player.getX()),
+                Utils.precisionRound(client.player.getX(), Variables.PositionPrecision.PRECISION),
                 client.player.getY(),
-                precisionRound(client.player.getZ())
+                Utils.precisionRound(client.player.getZ(), Variables.PositionPrecision.PRECISION)
         ));
 
         double distX;
@@ -68,17 +64,12 @@ public class MixinClientPlayerEntity {
 
         System.out.println(distX+" "+distZ);
 
-        if(distX==0 && distZ==0)
-        {
-            Variables.fixPositionActive=false;
-            return;
-        }
-
-        client.player.setPosition(client.player.getPos().subtract(
-            distX,
-            0,
-            distZ
-        ));
+        if(distX!=0 || distZ!=0)
+            client.player.setPosition(client.player.getPos().subtract(
+                distX,
+                0,
+                distZ
+            ));
 
         PlayerMoveC2SPacket packet=new PlayerMoveC2SPacket.PositionAndOnGround(
                 client.player.getPos().getX(),
@@ -86,23 +77,107 @@ public class MixinClientPlayerEntity {
                 client.player.getPos().getZ(),
                 false
         );
+        ((IMixinClientConn)networkHandler.getConnection()).sendImm(packet, null);
 
-        ((IMixinClientConn)networkHandler.getConnection()).sendImm(packet, null);packet=new PlayerMoveC2SPacket.PositionAndOnGround(
+        packet=new PlayerMoveC2SPacket.PositionAndOnGround(
             client.player.getPos().getX(),
             client.player.getPos().getY()+1000,
             client.player.getPos().getZ(),
             false
         );
-
         ((IMixinClientConn)networkHandler.getConnection()).sendImm(packet, null);
 
-//        Variables.fixPositionActive=false;
+        Variables.fixPositionActive=false;
+        if(distX==0 && distZ==0)
+        {
+        }
     }
 
 
     @Inject(method = "tick", at = @At("TAIL"))
-    void posAfter(CallbackInfo ci)
+    void uneventfulMove(CallbackInfo ci)
     {
-//        SheepClient.LOGGER.info("after"+client.player.getPos().toString());
+        if(!Flags.uneventfulMove())
+            return;
+
+        if(client.player.getX() == client.player.prevX &&
+            client.player.getZ() == client.player.prevZ)
+            return;
+
+        double maxDist=0.0035;
+
+        Vec3d prevPos= new Vec3d(client.player.prevX, client.player.prevY,client.player.prevZ);
+        Vec3d curPos=prevPos;
+        Vec3d diff=client.player.getPos().subtract(prevPos);
+        Vec3d diffDir=diff.normalize();
+
+        double dist=diff.length();
+
+        double stepDist;
+
+        for(int i=0;i<1;i++)
+        {
+            stepDist=Math.min(dist, maxDist);
+            curPos=curPos.add(diffDir.multiply(stepDist));
+            client.player.setPosition(curPos);
+            ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                    curPos.getX(),
+                    curPos.getY(),
+                    curPos.getZ(),
+                    false
+            ), null);
+            ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                    curPos.getX(),
+                    curPos.getY()+1000,
+                    curPos.getZ(),
+                    false
+            ), null);
+            dist-=stepDist;
+        }
+//        stepDist=Math.min(dist, maxDist);
+//
+//        System.out.println("Round2 "+stepDist);
+//
+//        curPos=curPos.add(diffDir.multiply(stepDist));
+//        client.player.setPosition(curPos);
+//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+//                curPos.getX(),
+//                curPos.getY(),
+//                curPos.getZ(),
+//                false
+//        ), null);
+//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+//                curPos.getX(),
+//                curPos.getY()+1000,
+//                curPos.getZ(),
+//                false
+//        ), null);
+//        dist-=stepDist;
+//        System.out.println(curPos);
+//        System.out.println("");
+
+//        stepDist=Math.min(dist, maxDist);
+//        curPos=curPos.add(diffDir.multiply(stepDist));
+//        client.player.setPosition(curPos);
+//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+//                curPos.getX(),
+//                curPos.getY(),
+//                curPos.getZ(),
+//                false
+//        ), null);
+//        dist-=stepDist;
+//
+//        curPos=curPos.add(diffDir.multiply(stepDist));
+//        client.player.setPosition(curPos);
+//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+//                curPos.getX(),
+//                curPos.getY(),
+//                curPos.getZ(),
+//                false
+//        ), null);
+//        dist-=stepDist;
+
+//        SheepClient.LOGGER.info("pos changed "+client.player.getPos().toString()+" "+client.player.prevX+", "+client.player.prevZ);
+//        SheepClient.LOGGER.info("speed "+client.player.getVelocity().toString());
     }
 }

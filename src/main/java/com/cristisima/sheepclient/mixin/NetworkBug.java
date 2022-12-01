@@ -1,5 +1,6 @@
 package com.cristisima.sheepclient.mixin;
 
+import com.cristisima.sheepclient.Flags;
 import com.cristisima.sheepclient.SheepClient;
 import com.cristisima.sheepclient.Variables;
 import com.cristisima.sheepclient.access.IMixinAdvancement_Builder;
@@ -18,7 +19,9 @@ import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +48,8 @@ public abstract class NetworkBug implements IMixinClientConn {
 
     @Shadow public abstract void send(Packet<?> packet);
 
+    @Shadow public abstract void send(Packet<?> packet, @Nullable PacketCallbacks callbacks);
+
     @Inject(at = @At("HEAD"), method = "send(Lnet/minecraft/network/Packet;)V", cancellable = true)
     public void sendBug(Packet<?> packet, CallbackInfo ci) {
 //        if(packet_name.equals)
@@ -64,13 +69,19 @@ public abstract class NetworkBug implements IMixinClientConn {
 //            System.out.println(fullPacket.getX(0));
 //        }
 
-        if(Variables.noPositionPacket)
+        if(Flags.noPositionPacket())
             if(packet.getClass().equals(PlayerMoveC2SPacket.Full.class) ||
                 packet.getClass().equals(PlayerMoveC2SPacket.PositionAndOnGround.class) ||
                 packet.getClass().equals(PlayerMoveC2SPacket.LookAndOnGround.class) ||
                 packet.getClass().equals(PlayerMoveC2SPacket.OnGroundOnly.class))
             {
-//                System.out.println("Cancel "+packet_name);
+//                if(packet.getClass().equals(PlayerMoveC2SPacket.Full.class))
+//                    send(new PlayerMoveC2SPacket.LookAndOnGround(
+//                            ((PlayerMoveC2SPacket) packet).getYaw(0),
+//                            ((PlayerMoveC2SPacket) packet).getPitch(0),
+//                            ((PlayerMoveC2SPacket) packet).isOnGround()
+//                    ));
+//                System.out.println("Cancel "+packet.getClass().getSimpleName());
                 ci.cancel();
                 return;
             }
@@ -80,7 +91,6 @@ public abstract class NetworkBug implements IMixinClientConn {
             int injected=Variables.injectedYVelocity;
             Variables.injectedYVelocity=0;
 
-//            send(Veloci);
 
         }
 
@@ -94,9 +104,11 @@ public abstract class NetworkBug implements IMixinClientConn {
         String packet_name=packet.getClass().getSimpleName();
         if(!Variables.packets_seen.contains(packet_name))
         {
-            SheepClient.LOGGER.info("Network Bug found(RECV): "+packet_name);
+//            SheepClient.LOGGER.info("Network Bug found(RECV): "+packet_name);
             Variables.packets_seen.add(packet_name);
         }
+//        else
+//            SheepClient.LOGGER.info("Network Bug found(RECV): "+packet_name);
     }
 
     @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
@@ -158,6 +170,26 @@ public abstract class NetworkBug implements IMixinClientConn {
 
         }
     }
+
+//    @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
+//    private static <T extends PacketListener> void handleServerReset(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+//        if(!packet.getClass().equals(PlayerPositionLookS2CPacket.class))
+//            return;
+//
+//        if(!Flags.uneventfulMove())
+//            return;
+////        WorldBorderInitializeS2CPacket borderPacket= (WorldBorderInitializeS2CPacket) packet;
+////
+////        if(eventPacket.getReason()!=GameStateChangeS2CPacket.GAME_MODE_CHANGED)
+////            return;
+////        ci.cancel();
+////        System.out.println(((PlayerPositionLookS2CPacket) packet).getX());
+//
+////        sendImm(new TeleportConfirmC2SPacket(((PlayerPositionLookS2CPacket) packet).getTeleportId()));
+//
+////        eventPacket.
+//    }
+
 
     public void sendImm(Packet<?> packet, @Nullable PacketCallbacks callbacks)
     {

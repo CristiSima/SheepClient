@@ -1,5 +1,7 @@
 package com.cristisima.sheepclient.mixin;
 
+import com.cristisima.sheepclient.Flags;
+import com.cristisima.sheepclient.Utils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 
@@ -15,10 +17,11 @@ public abstract class PositionPrecision
     @ModifyVariable(method = "setPos", at=@At("HEAD"), ordinal = 0)
     public double setPosX(double x)
     {
-        if(this.getClass().getSimpleName() == ClientPlayerEntity.class.getSimpleName() && Variables.PositionPrecision.active)
+        if(this.getClass().getSimpleName() == ClientPlayerEntity.class.getSimpleName() && Flags.positionPrecision())
         {
-            double scale = Math.pow(10, Variables.PositionPrecision.PRECISION);
-            return Math.round(x*scale)/scale;
+            x= Utils.precisionRound(x,Variables.PositionPrecision.PRECISION);
+            if(Utils.getDecimal(x,Variables.PositionPrecision.PRECISION+1)!=0)
+                System.out.println("setPosX round err "+x+" "+Utils.getDecimal(x,Variables.PositionPrecision.PRECISION+1));
         }
         return x;
     }
@@ -26,10 +29,11 @@ public abstract class PositionPrecision
     @ModifyVariable(method = "setPos", at=@At("HEAD"), ordinal = 2)
     public double setPosZ(double z)
     {
-        if(this.getClass().getSimpleName() == ClientPlayerEntity.class.getSimpleName() && Variables.PositionPrecision.active)
+        if(this.getClass().getSimpleName() == ClientPlayerEntity.class.getSimpleName() && Flags.positionPrecision())
         {
-            double scale = Math.pow(10, Variables.PositionPrecision.PRECISION);
-            return Math.round(z*scale)/scale;
+            z= Utils.precisionRound(z,Variables.PositionPrecision.PRECISION);
+            if(Utils.getDecimal(z,Variables.PositionPrecision.PRECISION+1)!=0)
+                System.out.println("setPosZ round err "+z+" "+Utils.getDecimal(z,Variables.PositionPrecision.PRECISION+1));
         }
         return z;
     }
