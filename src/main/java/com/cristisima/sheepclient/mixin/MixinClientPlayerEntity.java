@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
@@ -115,7 +116,7 @@ public class MixinClientPlayerEntity {
 
         double stepDist;
 
-        for(int i=0;i<1;i++)
+        for(int i=0;i<Variables.uneventfulMove.max_rate;i++)
         {
             stepDist=Math.min(dist, maxDist);
             curPos=curPos.add(diffDir.multiply(stepDist));
@@ -133,51 +134,17 @@ public class MixinClientPlayerEntity {
                     false
             ), null);
             dist-=stepDist;
+
+            // sync pos
+            Variables.last_sync_id++;
+            ((IMixinClientConn)networkHandler.getConnection()).sendImm(new TeleportConfirmC2SPacket(
+                    Variables.last_sync_id
+            ), null);
+//            System.out.println("Predicted sync "+Variables.last_sync_id);
+
+//            System.out.println("left "+dist);
+            if(dist <0.00001)
+                break;
         }
-//        stepDist=Math.min(dist, maxDist);
-//
-//        System.out.println("Round2 "+stepDist);
-//
-//        curPos=curPos.add(diffDir.multiply(stepDist));
-//        client.player.setPosition(curPos);
-//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
-//                curPos.getX(),
-//                curPos.getY(),
-//                curPos.getZ(),
-//                false
-//        ), null);
-//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
-//                curPos.getX(),
-//                curPos.getY()+1000,
-//                curPos.getZ(),
-//                false
-//        ), null);
-//        dist-=stepDist;
-//        System.out.println(curPos);
-//        System.out.println("");
-
-//        stepDist=Math.min(dist, maxDist);
-//        curPos=curPos.add(diffDir.multiply(stepDist));
-//        client.player.setPosition(curPos);
-//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
-//                curPos.getX(),
-//                curPos.getY(),
-//                curPos.getZ(),
-//                false
-//        ), null);
-//        dist-=stepDist;
-//
-//        curPos=curPos.add(diffDir.multiply(stepDist));
-//        client.player.setPosition(curPos);
-//        ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
-//                curPos.getX(),
-//                curPos.getY(),
-//                curPos.getZ(),
-//                false
-//        ), null);
-//        dist-=stepDist;
-
-//        SheepClient.LOGGER.info("pos changed "+client.player.getPos().toString()+" "+client.player.prevX+", "+client.player.prevZ);
-//        SheepClient.LOGGER.info("speed "+client.player.getVelocity().toString());
     }
 }

@@ -44,7 +44,12 @@ public class Variables {
 
     public static int injectedYVelocity=0;
     public static boolean noPositionPacket=false;
-    public static boolean uneventfulMove =false;
+    public static class uneventfulMove
+    {
+        public static boolean active=false;
+        public static int max_rate=7;
+    }
+
     public static boolean noDemo=true;
     public static boolean noCreative=false;
     public static boolean fixPositionActive=false;
@@ -52,5 +57,7 @@ public class Variables {
     public static boolean NoFall=true;
 
     public static Set<String> packets_seen=new HashSet();
+
+    public static int last_sync_id=0;
 
 }

@@ -241,9 +241,38 @@ public class SheepScreen extends Screen {
 
         width=120;
         this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
-                Text.literal(OnOffName(UNEVENTFUL_MOVE_BASE, Variables.uneventfulMove)), (button) -> {
-            Variables.uneventfulMove=!Variables.uneventfulMove;
-            button.setMessage(Text.literal(OnOffName(UNEVENTFUL_MOVE_BASE, Variables.uneventfulMove)));
+                Text.literal(OnOffName(UNEVENTFUL_MOVE_BASE, Variables.uneventfulMove.active)), (button) -> {
+            Variables.uneventfulMove.active=!Variables.uneventfulMove.active;
+            button.setMessage(Text.literal(OnOffName(UNEVENTFUL_MOVE_BASE, Variables.uneventfulMove.active)));
+        }));
+        x_base+=width+5;
+
+        width=20;
+//        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
+//                Text.literal("R"), (button) -> {
+//            Variables.last_sync_id=0;
+//        }));
+//        x_base+=width+5;
+
+        x_base+=width+5;
+        ButtonWidget uneventfulMove_rate_widget = new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
+                Text.literal(String.valueOf(Variables.uneventfulMove.max_rate)), (button) -> {
+            Variables.uneventfulMove.max_rate=7;
+            button.setMessage(Text.literal(String.valueOf(Variables.uneventfulMove.max_rate)));
+        });
+        x_base-=width+5;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
+                Text.literal("-"), (button) -> {
+            Variables.uneventfulMove.max_rate=Math.max(Variables.uneventfulMove.max_rate-1,0);
+            uneventfulMove_rate_widget.setMessage(Text.literal(String.valueOf(Variables.uneventfulMove.max_rate)));
+        }));
+        this.addDrawableChild(uneventfulMove_rate_widget);
+        x_base+=width+5;
+        x_base+=width+5;
+        this.addDrawableChild(new ButtonWidget(this.width / 2 + calcXOffset(i)+x_base, this.height / 6 - 12 + 24 * (i >> 1), width, 20,
+                Text.literal("+"), (button) -> {
+            Variables.uneventfulMove.max_rate=Math.min(Variables.uneventfulMove.max_rate+1,20);
+            uneventfulMove_rate_widget.setMessage(Text.literal(String.valueOf(Variables.uneventfulMove.max_rate)));
         }));
         x_base+=width+5;
 

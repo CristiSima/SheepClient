@@ -5,30 +5,18 @@ import com.cristisima.sheepclient.SheepClient;
 import com.cristisima.sheepclient.Variables;
 import com.cristisima.sheepclient.access.IMixinAdvancement_Builder;
 import com.cristisima.sheepclient.access.IMixinClientConn;
-import com.sun.jna.platform.win32.OaIdl;
-import io.netty.buffer.ByteBuf;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementDisplay;
-import net.minecraft.advancement.AdvancementRewards;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.Packet;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.*;
 import net.minecraft.network.listener.PacketListener;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.launch.platform.container.IContainerHandle;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -42,7 +30,11 @@ import java.util.Map;
 
 @Mixin(ClientConnection.class)
 public abstract class NetworkBug implements IMixinClientConn {
-
+    @Inject(at=@At("HEAD"), method = "channelActive")
+    private void connectionReset(ChannelHandlerContext context, CallbackInfo ci)
+    {
+        Variables.last_sync_id=0;
+    }
 
     @Shadow protected abstract void sendImmediately(Packet<?> packet, @Nullable PacketCallbacks callbacks);
 
@@ -112,6 +104,24 @@ public abstract class NetworkBug implements IMixinClientConn {
     }
 
     @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
+    private static <T extends PacketListener> void handlePositionSync(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+        if(!packet.getClass().equals(PlayerPositionLookS2CPacket.class))
+            return;
+
+        PlayerPositionLookS2CPacket eventPacket= (PlayerPositionLookS2CPacket) packet;
+
+//        System.out.println(eventPacket.getTeleportId()+" "+Variables.last_sync_id);
+        if(eventPacket.getTeleportId()<=Variables.last_sync_id) {
+            ci.cancel();
+            return;
+        }
+
+        Variables.last_sync_id=eventPacket.getTeleportId();
+        System.out.println("Sync("+eventPacket.getTeleportId()+") @ "+eventPacket.getX()+","+eventPacket.getY()+","+eventPacket.getZ());
+
+    }
+
+    @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
     private static <T extends PacketListener> void handleDemo(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
         if(!Variables.noDemo)
             return;
@@ -136,7 +146,6 @@ public abstract class NetworkBug implements IMixinClientConn {
         if(Variables.noCreative &&
                 eventPacket.getValue()==1)
             ci.cancel();
-//        eventPacket.
     }
     @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
     private static <T extends PacketListener> void handleWorldBorder(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
@@ -148,7 +157,6 @@ public abstract class NetworkBug implements IMixinClientConn {
 //        if(eventPacket.getReason()!=GameStateChangeS2CPacket.GAME_MODE_CHANGED)
 //            return;
         ci.cancel();
-//        eventPacket.
     }
 
     @Inject(at=@At("HEAD"), method = "handlePacket")

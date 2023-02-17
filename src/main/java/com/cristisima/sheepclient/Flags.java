@@ -3,7 +3,7 @@ package com.cristisima.sheepclient;
 public class Flags {
     public static boolean ignoreForcedRotation()
     {
-        if(Variables.uneventfulMove)
+        if(Variables.uneventfulMove.active)
             return true;
 
         return false;
@@ -13,7 +13,7 @@ public class Flags {
     {
         if(Variables.fixPositionActive)
             return false;
-        if(Variables.uneventfulMove)
+        if(Variables.uneventfulMove.active)
             return false;
 
         return Variables.PositionPrecision.active;
@@ -33,13 +33,13 @@ public class Flags {
     {
         if(Variables.fixPositionActive)
             return true;
-        if(Variables.uneventfulMove)
+        if(Variables.uneventfulMove.active)
             return true;
 
         return Variables.noPositionPacket;
     }
 
     public static boolean uneventfulMove() {
-        return Variables.uneventfulMove;
+        return Variables.uneventfulMove.active;
     }
 }
