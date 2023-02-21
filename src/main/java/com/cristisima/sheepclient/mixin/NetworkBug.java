@@ -14,6 +14,7 @@ import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -110,7 +111,7 @@ public abstract class NetworkBug implements IMixinClientConn {
 
         PlayerPositionLookS2CPacket eventPacket= (PlayerPositionLookS2CPacket) packet;
 
-//        System.out.println(eventPacket.getTeleportId()+" "+Variables.last_sync_id);
+        Variables.last_sync_pos=new Vec3d(eventPacket.getX(), eventPacket.getY(), eventPacket.getZ());
         if(eventPacket.getTeleportId()<=Variables.last_sync_id) {
             ci.cancel();
             return;

@@ -9,6 +9,23 @@ public class Flags {
         return false;
     }
 
+    public static boolean flyActive()
+    {
+        if(Variables.uneventfulMove.active)
+            return false;
+
+        return Variables.FlyActive;
+    }
+
+
+    public static boolean noFallDmg()
+    {
+        if(Variables.uneventfulMove.active)
+            return  false;
+
+        return Variables.NoFall;
+    }
+
     public static boolean positionPrecision()
     {
         if(Variables.fixPositionActive)

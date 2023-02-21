@@ -6,6 +6,7 @@ import com.cristisima.sheepclient.Utils;
 import com.cristisima.sheepclient.Variables;
 import com.cristisima.sheepclient.access.IMixinClientConn;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -27,6 +28,8 @@ public class MixinClientPlayerEntity {
 
     @Shadow @Final public ClientPlayNetworkHandler networkHandler;
 
+
+    @Shadow public Input input;
 
     @Inject(method = "tick", at = @At("HEAD"))
     void posBefore(CallbackInfo ci)
@@ -72,13 +75,15 @@ public class MixinClientPlayerEntity {
                 distZ
             ));
 
+        IMixinClientConn clientConn= (IMixinClientConn) networkHandler.getConnection();
+
         PlayerMoveC2SPacket packet=new PlayerMoveC2SPacket.PositionAndOnGround(
                 client.player.getPos().getX(),
                 client.player.getPos().getY(),
                 client.player.getPos().getZ(),
                 false
         );
-        ((IMixinClientConn)networkHandler.getConnection()).sendImm(packet, null);
+        clientConn.sendImm(packet, null);
 
         packet=new PlayerMoveC2SPacket.PositionAndOnGround(
             client.player.getPos().getX(),
@@ -86,7 +91,7 @@ public class MixinClientPlayerEntity {
             client.player.getPos().getZ(),
             false
         );
-        ((IMixinClientConn)networkHandler.getConnection()).sendImm(packet, null);
+        clientConn.sendImm(packet, null);
 
         Variables.fixPositionActive=false;
         if(distX==0 && distZ==0)
@@ -94,57 +99,154 @@ public class MixinClientPlayerEntity {
         }
     }
 
-
+    int uneventfulFlyCounter=0;
     @Inject(method = "tick", at = @At("TAIL"))
     void uneventfulMove(CallbackInfo ci)
     {
         if(!Flags.uneventfulMove())
             return;
 
+        uneventfulFlyCounter++;
+        if(uneventfulFlyCounter>20) {
+            uneventfulAntiFly();
+            return;
+        } else if (uneventfulFlyCounter==1) {
+            uneventfulAntiFlyResync();
+        }
+
         if(client.player.getX() == client.player.prevX &&
-            client.player.getZ() == client.player.prevZ)
+            client.player.getZ() == client.player.prevZ &&
+            client.player.getY() == client.player.prevY
+        )
             return;
 
         double maxDist=0.0035;
+        maxDist=0.06;
 
         Vec3d prevPos= new Vec3d(client.player.prevX, client.player.prevY,client.player.prevZ);
         Vec3d curPos=prevPos;
         Vec3d diff=client.player.getPos().subtract(prevPos);
+        client.player.setPosition(curPos);
+        if(input.jumping)
+            diff=new Vec3d(0, 1, 0);
+        else if (input.sneaking)
+            diff=new Vec3d(0, -1, 0);
+        else if(input.pressingBack||input.pressingForward||input.pressingRight||input.pressingLeft)
+            diff=diff.subtract(0, diff.y, 0);
+        else
+            return;
+
         Vec3d diffDir=diff.normalize();
 
         double dist=diff.length();
 
         double stepDist;
+        IMixinClientConn clientConn= (IMixinClientConn) networkHandler.getConnection();
 
         for(int i=0;i<Variables.uneventfulMove.max_rate;i++)
         {
             stepDist=Math.min(dist, maxDist);
             curPos=curPos.add(diffDir.multiply(stepDist));
             client.player.setPosition(curPos);
-            ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+            clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
                     curPos.getX(),
                     curPos.getY(),
                     curPos.getZ(),
                     false
             ), null);
-            ((IMixinClientConn)networkHandler.getConnection()).sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+            clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
                     curPos.getX(),
-                    curPos.getY()+1000,
+                    curPos.getY()-1000,
                     curPos.getZ(),
-                    false
+                    true
             ), null);
             dist-=stepDist;
 
             // sync pos
             Variables.last_sync_id++;
-            ((IMixinClientConn)networkHandler.getConnection()).sendImm(new TeleportConfirmC2SPacket(
+            clientConn.sendImm(new TeleportConfirmC2SPacket(
                     Variables.last_sync_id
             ), null);
 //            System.out.println("Predicted sync "+Variables.last_sync_id);
-
-//            System.out.println("left "+dist);
-            if(dist <0.00001)
-                break;
         }
+    }
+
+    void uneventfulAntiFly()
+    {
+        Vec3d curPos= new Vec3d(client.player.prevX, client.player.prevY,client.player.prevZ);
+        client.player.setPosition(curPos);
+
+        uneventfulFlyCounter=0;
+        Vec3d diffDir=new Vec3d(0, -0.06, 0);
+
+
+        IMixinClientConn clientConn= (IMixinClientConn) networkHandler.getConnection();
+
+//        sync pos
+        clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                curPos.getX(),
+                curPos.getY(),
+                curPos.getZ(),
+                false
+        ), null);
+        clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                curPos.getX(),
+                curPos.getY()-1000,
+                curPos.getZ(),
+                true
+        ), null);
+        Variables.last_sync_id++;
+        clientConn.sendImm(new TeleportConfirmC2SPacket(
+                Variables.last_sync_id
+        ), null);
+
+//        move down
+        curPos=curPos.add(diffDir);
+        clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                curPos.getX(),
+                curPos.getY(),
+                curPos.getZ(),
+                false
+        ), null);
+        clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                curPos.getX(),
+                curPos.getY()-1000,
+                curPos.getZ(),
+                true
+        ), null);
+        Variables.last_sync_id++;
+        clientConn.sendImm(new TeleportConfirmC2SPacket(
+                Variables.last_sync_id
+        ), null);
+
+//        move back
+        curPos=curPos.subtract(diffDir);
+        client.player.setPosition(curPos);
+
+
+    }
+
+    void uneventfulAntiFlyResync()
+    {
+        IMixinClientConn clientConn= (IMixinClientConn) networkHandler.getConnection();
+        Vec3d curPos= new Vec3d(client.player.prevX, client.player.prevY,client.player.prevZ);
+        client.player.setPosition(curPos);
+
+        clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                curPos.getX(),
+                curPos.getY(),
+                curPos.getZ(),
+                false
+        ), null);
+        clientConn.sendImm(new PlayerMoveC2SPacket.PositionAndOnGround(
+                curPos.getX(),
+                curPos.getY()-1000,
+                curPos.getZ(),
+                true
+        ), null);
+        Variables.last_sync_id++;
+        clientConn.sendImm(new TeleportConfirmC2SPacket(
+                Variables.last_sync_id
+        ), null);
     }
 }

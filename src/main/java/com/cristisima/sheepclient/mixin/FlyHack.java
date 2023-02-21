@@ -1,4 +1,5 @@
 package com.cristisima.sheepclient.mixin;
+import com.cristisima.sheepclient.Flags;
 import com.cristisima.sheepclient.Variables;
 import com.cristisima.sheepclient.access.IMixinClientConn;
 import net.minecraft.client.MinecraftClient;
@@ -36,10 +37,9 @@ public class FlyHack {
     @Inject(method = "tick", at = @At("TAIL"))
     void antiAntiFly(CallbackInfo ci)
     {
+        client.player.getAbilities().allowFlying= Flags.flyActive();
 
-        client.player.getAbilities().allowFlying= Variables.FlyActive;
-
-        if(!client.player.getAbilities().flying)
+        if(!Flags.flyActive() || !client.player.getAbilities().flying)
         {
             flyCount=0;
             return;
@@ -55,7 +55,6 @@ public class FlyHack {
 
         newY-= bypassDiff;
 
-//        SheepClient.LOGGER.info("AntiAntiFly with "+client.player.getPos());
         PlayerMoveC2SPacket packet=new PlayerMoveC2SPacket.PositionAndOnGround(
                 client.player.getPos().getX(),
                 newY,
@@ -71,7 +70,7 @@ public class FlyHack {
     void noFallDmg(CallbackInfo ci)
     {
 
-        if(!Variables.NoFall && !client.player.getAbilities().flying)
+        if(!Flags.noFallDmg() || !client.player.getAbilities().flying)
             return;
 
         if(client.player.getVelocity().getY()>-0.2)
@@ -100,7 +99,6 @@ public class FlyHack {
                 client.player.getVelocity().getZ()
         );
 
-//        SheepClient.LOGGER.info("no Fall with "+client.player.getPos());
         PlayerMoveC2SPacket packet=new PlayerMoveC2SPacket.PositionAndOnGround(
                 client.player.getPos().getX(),
                 newY,
@@ -109,6 +107,5 @@ public class FlyHack {
         );
 
         ((IMixinClientConn)networkHandler.getConnection()).sendImm(packet, null);
-
     }
 }

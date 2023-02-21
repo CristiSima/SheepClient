@@ -1,6 +1,7 @@
 package com.cristisima.sheepclient;
 
 import net.minecraft.client.network.ServerAddress;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -59,5 +60,6 @@ public class Variables {
     public static Set<String> packets_seen=new HashSet();
 
     public static int last_sync_id=0;
+    public static Vec3d last_sync_pos;
 
 }
