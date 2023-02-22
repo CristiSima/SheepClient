@@ -69,29 +69,23 @@ public class FlyHack {
     @Inject(method = "tick", at = @At("TAIL"))
     void noFallDmg(CallbackInfo ci)
     {
-
-        if(!Flags.noFallDmg() || !client.player.getAbilities().flying)
+        if(!Flags.noFallDmg())
             return;
 
-        if(client.player.getVelocity().getY()>-0.2)
+        if(client.player.getAbilities().flying || client.player.getVelocity().getY()>-0.5)
             return;
 
-        double newY=prevY;
-
-//        free fall
         var blockBellow1=client.player.world.getBlockState(new BlockPos(client.player.getPos().subtract(0, 1, 0)));
         var blockBellow2=client.player.world.getBlockState(new BlockPos(client.player.getPos().subtract(0, 2, 0)));
-        var blockBellow3=client.player.world.getBlockState(new BlockPos(client.player.getPos().subtract(0, 3, 0)));
-        if(blockBellow1.isAir() && blockBellow2.isAir() && blockBellow3.isAir()) {
+        if(blockBellow1.isAir() && blockBellow2.isAir()) {
             fallCount=0;
             return;
         }
 
-
         if((fallCount++)%10!=0)
             return;
 
-        newY+= bypassDiff;
+        double newY=prevY+bypassDiff;
 
         client.player.setVelocity(
                 client.player.getVelocity().getX(),
