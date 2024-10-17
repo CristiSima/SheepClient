@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import com.cristisima.sheepclient.Variables;
 
 @Mixin(Entity.class)
-//public abstract class PositionPresicion implements Nameable, EntityLike, CommandOutput
 public abstract class PositionPrecision
 {
     @ModifyVariable(method = "setPos", at=@At("HEAD"), ordinal = 0)

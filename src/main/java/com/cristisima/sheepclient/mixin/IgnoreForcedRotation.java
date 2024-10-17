@@ -3,6 +3,7 @@ package com.cristisima.sheepclient.mixin;
 import com.cristisima.sheepclient.Flags;
 import org.spongepowered.asm.mixin.Mixin;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -29,14 +30,14 @@ public class IgnoreForcedRotation {
     }
 
     @Inject(method = "getFlags", at=@At("RETURN"), cancellable = true)
-    void setRots(CallbackInfoReturnable<Set<PlayerPositionLookS2CPacket.Flag>> cir)
+    void setRots(CallbackInfoReturnable<Set<PositionFlag>> cir)
     {
         if(!Flags.ignoreForcedRotation())
             return;
 
         var flags=cir.getReturnValue();
-        flags.add(PlayerPositionLookS2CPacket.Flag.Y_ROT);
-        flags.add(PlayerPositionLookS2CPacket.Flag.X_ROT);
+        flags.add(PositionFlag.Y_ROT);
+        flags.add(PositionFlag.X_ROT);
         cir.setReturnValue(flags);
     }
 

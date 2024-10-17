@@ -35,13 +35,13 @@ public class SheepClientMenu_Setings extends Screen {
 
 //        @Shadow int i;
         int i=2;
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + 5+150/4, this.height / 6 - 12 + 24 * (i >> 1), 150/2, 20, Text.literal("SheepClient"), (button) -> {
+        this.addDrawableChild(new ButtonWidget.Builder(Text.literal("SheepClient"), (button) -> {
 //            this.client.setScreen(new OnlineOptionsScreen(this, this.settings));
             SheepClient.LOGGER.info("Ohoo, what's this, you think you can configure me??");
 
             SheepClient.LOGGER.info("Lets see if you have what it takes");
             this.client.setScreen(new SheepScreen(this));
-        }));
+        }).size(150/2, 20).position(width / 2 + 5+150/4, this.height / 6 - 12 + 24 * (i >> 1)).build());
     }
 }
 

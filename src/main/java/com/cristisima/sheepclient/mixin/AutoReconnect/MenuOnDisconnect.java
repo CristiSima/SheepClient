@@ -61,11 +61,11 @@ public class MenuOnDisconnect extends Screen {
         reconnectTimer = Variables.AutoReconnect.reconnectAfter;
         SheepClient.LOGGER.info("Init Auto reconnect");
 
-        reconnectWidget = addDrawableChild(new ButtonWidget(center, height, width, 20,
-                Text.literal(getReconnectIn()), (button) -> {
-            Variables.AutoReconnect.reconnectOnMultiplayerMenu=true;
-            this.client.setScreen(parent);
-        }));
+        reconnectWidget = addDrawableChild(new ButtonWidget.Builder(Text.literal(getReconnectIn()),
+            (button) -> {
+                Variables.AutoReconnect.reconnectOnMultiplayerMenu=true;
+                this.client.setScreen(parent);
+        }).position(center, height).size(width, 20).build());
     }
 
     @Inject(method = "render", at = @At("HEAD"))

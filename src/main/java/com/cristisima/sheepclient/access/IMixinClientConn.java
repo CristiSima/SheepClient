@@ -1,6 +1,6 @@
 package com.cristisima.sheepclient.access;
 
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketCallbacks;
 import org.jetbrains.annotations.Nullable;
 

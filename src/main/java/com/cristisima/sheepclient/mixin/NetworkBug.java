@@ -8,6 +8,7 @@ import com.cristisima.sheepclient.access.IMixinClientConn;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.network.*;
+import net.minecraft.network.packet.*;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 //import net.minecraft.network.listener.
 
@@ -43,7 +45,7 @@ public abstract class NetworkBug implements IMixinClientConn {
 
     @Shadow public abstract void send(Packet<?> packet, @Nullable PacketCallbacks callbacks);
 
-    @Inject(at = @At("HEAD"), method = "send(Lnet/minecraft/network/Packet;)V", cancellable = true)
+    @Inject(at = @At("HEAD"), method = "send(Lnet/minecraft/network/packet/Packet;)V", cancellable = true)
     public void sendBug(Packet<?> packet, CallbackInfo ci) {
 //        if(packet_name.equals)
 //        if(!Variables.packets_seen.contains(packet_name))
@@ -102,6 +104,30 @@ public abstract class NetworkBug implements IMixinClientConn {
         }
 //        else
 //            SheepClient.LOGGER.info("Network Bug found(RECV): "+packet_name);
+    }
+
+    @Inject(at=@At("HEAD"), method = "handlePacket")
+    private static <T extends PacketListener> void packetLogger(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+        if(Variables.log_packets)
+        {
+            String packet_name=packet.getClass().getSimpleName();
+            StringBuilder packet_info = new StringBuilder("Packet Logger got: ");
+            packet_info.append(packet_name);
+            packet_info.append(" { ");
+            for (Field field: packet.getClass().getFields()) {
+                packet_info.append(field.getName());
+                packet_info.append("=[");
+                try {
+                    packet_info.append(field.get(packet));
+                } catch (Exception e) {
+                    packet_info.append(e.toString());
+                }
+                packet_info.append("] ");
+            }
+            packet_info.append("}");
+
+            SheepClient.LOGGER.info(packet_info.toString());
+        }
     }
 
     @Inject(at=@At("HEAD"), method = "handlePacket", cancellable = true)
@@ -171,10 +197,10 @@ public abstract class NetworkBug implements IMixinClientConn {
              packet.getAdvancementsToEarn().entrySet()){
             if(entry.getKey().toString().startsWith("minecraft:recipes"))
                 continue;
-            Advancement.Builder val=(Advancement.Builder)entry.getValue();
-            SheepClient.LOGGER.info(((IMixinAdvancement_Builder)(Object)val).getDisplay().getTitle().getString()
+            Advancement.Builder val = entry.getValue();
+            SheepClient.LOGGER.info(((IMixinAdvancement_Builder)val).getDisplay().getTitle().getString()
                     + "\t|\t"
-                    + (((IMixinAdvancement_Builder)(Object)val).getDisplay().getDescription().getString())
+                    + (((IMixinAdvancement_Builder)val).getDisplay().getDescription().getString())
             );
 
         }

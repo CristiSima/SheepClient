@@ -7,6 +7,8 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,6 +20,12 @@ import static java.lang.Math.max;
 
 @Mixin(ClientPlayerEntity.class)
 public class FlyHack {
+    private static Vec3i Vec3dTo3i(Vec3d vec)
+    {
+        return new Vec3i((int) vec.x, (int) vec.y, (int) vec.z);
+    }
+
+
     @Shadow @Final protected MinecraftClient client;
 
     @Shadow @Final public ClientPlayNetworkHandler networkHandler;
@@ -75,8 +83,8 @@ public class FlyHack {
         if(client.player.getAbilities().flying || client.player.getVelocity().getY()>-0.5)
             return;
 
-        var blockBellow1=client.player.world.getBlockState(new BlockPos(client.player.getPos().subtract(0, 1, 0)));
-        var blockBellow2=client.player.world.getBlockState(new BlockPos(client.player.getPos().subtract(0, 2, 0)));
+        var blockBellow1=client.player.world.getBlockState(new BlockPos(Vec3dTo3i(client.player.getPos().subtract(0, 1, 0))));
+        var blockBellow2=client.player.world.getBlockState(new BlockPos(Vec3dTo3i(client.player.getPos().subtract(0, 2, 0))));
         if(blockBellow1.isAir() && blockBellow2.isAir()) {
             fallCount=0;
             return;

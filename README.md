@@ -3,7 +3,7 @@
 The _best_~~(if you ignore all the others)~~ minecraft _utility_ client. :}  
 Developed for LiveOverflow's [Minecraft:Hacked](https://www.youtube.com/playlist?list=PLhixgUqwRTjwvBI-hmbZ2rpkAl4lutnJG) series/server.
 
-**Version: 1.19.2**
+**Version: 1.19.4**
 
 ### Features:
 - **Position Precision**: don't waste your time with all the digits in the player's position, limit them to just 2

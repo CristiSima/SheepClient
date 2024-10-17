@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Variables {
+    public static boolean log_packets = false;
+
     public  static class PositionPrecision {
         public static int DEFAULT = 2;
         public static int PRECISION = DEFAULT;
@@ -57,7 +59,7 @@ public class Variables {
     public static boolean FlyActive=true;
     public static boolean NoFall=true;
 
-    public static Set<String> packets_seen=new HashSet();
+    public static Set<String> packets_seen=new HashSet<>();
 
     public static int last_sync_id=0;
     public static Vec3d last_sync_pos;
