@@ -138,7 +138,7 @@ public abstract class NetworkBug implements IMixinClientConn {
         PlayerPositionLookS2CPacket eventPacket= (PlayerPositionLookS2CPacket) packet;
 
         Variables.last_sync_pos=new Vec3d(eventPacket.getX(), eventPacket.getY(), eventPacket.getZ());
-        if(eventPacket.getTeleportId()<=Variables.last_sync_id) {
+        if(Variables.uneventfulMove.active && eventPacket.getTeleportId() < Variables.last_sync_id) {
             ci.cancel();
             return;
         }
